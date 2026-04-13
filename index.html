@@ -6,79 +6,247 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #34ebd2;
+        background-color: #f5f7fa;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
+        padding: 20px;
       }
 
       .app {
         background: white;
-        padding: 30px;
-        border-radius: 10px;
+        padding: 28px;
+        border-radius: 12px;
         width: 100%;
         max-width: 600px;
-
         text-align: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 
         display: flex;
         flex-direction: column;
         gap: 14px;
       }
 
+      h1 {
+        margin: 0;
+        font-size: 42px;
+        line-height: 1.1;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
       select, button {
-        padding: 8px;
+        padding: 10px 12px;
         font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #cfd6df;
       }
 
       button {
         cursor: pointer;
+        background: #1f6feb;
+        color: white;
+        border: 1px solid #1f6feb;
+      }
+
+      button:hover {
+        background: #185bd0;
+      }
+
+      /* Image area */
+      .imageWrap {
+        display: flex;
+        justify-content: center;
+      }
+
+      img#baitImg {
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: #fff;
+      }
+
+      #output {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      .hint {
+        font-size: 13px;
+        color: #637083;
+        margin: 0;
       }
     </style>
   </head>
 
   <body>
-    <!-- ✅ THIS DIV IS CRITICAL -->
     <div class="app">
       <h1>Bait Finder</h1>
 
-      <p>Select a fish species:</p>
+      <p class="hint">Pick a species → get a quick color suggestion.</p>
 
-      <select id="fish">
-        <option value="">-- Choose a fish --</option>
-        <option value="bass">Bass</option>
-        <option value="trout">Trout</option>
-        <option value="catfish">Catfish</option>
-        <option value="crappie">Crappie</option>
-      </select>
+      <div class="controls">
+        <select id="fish">
+          <option value="">-- Choose a fish --</option>
+          <option value="bass">Bass</option>
+          <option value="trout">Trout</option>
+          <option value="catfish">Catfish</option>
+          <option value="crappie">Crappie</option>
+        </select>
 
-      <button onclick="recommendBait()">Recommend Bait</button>
+        <button onclick="recommendBait()">Recommend Bait</button>
+      </div>
 
-      <p id="output"></p>
+      <div class="imageWrap">
+        <img
+          id="baitImg"
+          alt="Bait color recommendation will appear here"
+          src=""
+        />
+      </div>
+
+      <p id="output">Choose a fish and click “Recommend Bait”.</p>
     </div>
 
     <script>
+      // Helper: turn an SVG string into an image src
+      function svgData(svgString) {
+        return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
+      }
+
+      // Helper: generate a simple "color card" image
+      function makeCard(title, subtitle, bg1, bg2, accent, stripes = false) {
+        const stripeLayer = stripes
+          ? `<g opacity="0.18">
+               <rect x="-80" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
+               <rect x="0" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
+               <rect x="80" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
+               <rect x="160" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
+               <rect x="240" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
+             </g>`
+          : "";
+
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480">
+            <defs>
+              <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="${bg1}"/>
+                <stop offset="100%" stop-color="${bg2}"/>
+              </linearGradient>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.25"/>
+              </filter>
+            </defs>
+
+            <rect width="960" height="480" rx="36" fill="url(#bg)"/>
+            ${stripeLayer}
+
+            <!-- Simple lure silhouette -->
+            <g transform="translate(705,115)" filter="url(#soft)" opacity="0.95">
+              <path d="M40 40 C120 10, 190 60, 200 115 C210 175, 150 220, 90 220 C25 220, -5 170, 5 130 C10 110, 25 90, 40 80"
+                    fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+              <circle cx="40" cy="40" r="10" fill="#ffffff"/>
+              <path d="M190 225 C205 245, 230 245, 240 225" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+              <path d="M210 230 C212 252, 240 262, 252 244" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+            </g>
+
+            <!-- Text -->
+            <g font-family="Arial, sans-serif" fill="#ffffff">
+              <text x="56" y="120" font-size="56" font-weight="700">${title}</text>
+              <text x="56" y="175" font-size="32" opacity="0.95">${subtitle}</text>
+            </g>
+
+            <!-- Bottom badge -->
+            <g transform="translate(56,360)">
+              <rect width="410" height="74" rx="18" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.35)"/>
+              <text x="24" y="48" font-family="Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.98">
+                Quick color cue (not a rule)
+              </text>
+            </g>
+          </svg>
+        `;
+        return svgData(svg);
+      }
+
+      // “Database” for recommendations (text + image)
+      const baitMap = {
+        bass: {
+          message: "Bass: Try green pumpkin or black/blue.",
+          img: makeCard(
+            "Green Pumpkin",
+            "and Black/Blue accents",
+            "#3d4f1f",
+            "#101418",
+            "#0b0f14",
+            true
+          ),
+          alt: "Green pumpkin and black-blue color card"
+        },
+        trout: {
+          message: "Trout: Try white, silver, or natural colors.",
+          img: makeCard(
+            "White / Silver",
+            "natural + subtle flash",
+            "#e8edf5",
+            "#8fa3b7",
+            "#ffffff",
+            false
+          ),
+          alt: "White and silver color card"
+        },
+        catfish: {
+          message: "Catfish: Try dark colors and/or smelly baits.",
+          img: makeCard(
+            "Dark / Night",
+            "big silhouette + scent",
+            "#1a1a1a",
+            "#3a2d2a",
+            "#000000",
+            true
+          ),
+          alt: "Dark color card"
+        },
+        crappie: {
+          message: "Crappie: Try chartreuse or white.",
+          img: makeCard(
+            "Chartreuse",
+            "with white combo",
+            "#b6ff00",
+            "#ffffff",
+            "#224400",
+            false
+          ),
+          alt: "Chartreuse and white color card"
+        }
+      };
+
       function recommendBait() {
         const fish = document.getElementById("fish").value;
-        let result = "";
+        const output = document.getElementById("output");
+        const baitImg = document.getElementById("baitImg");
 
-        if (fish === "bass") {
-          result = "Try green pumpkin or black/blue.";
-        } else if (fish === "trout") {
-          result = "Try white, silver, or natural colors.";
-        } else if (fish === "catfish") {
-          result = "Try dark colors or smelly baits.";
-        } else if (fish === "crappie") {
-          result = "Try chartreuse or white.";
-        } else {
-          result = "Please select a fish species.";
+        if (!fish || !baitMap[fish]) {
+          output.innerText = "Please select a fish species.";
+          baitImg.src = "";
+          baitImg.alt = "No recommendation yet";
+          return;
         }
 
-        document.getElementById("output").innerText = result;
+        output.innerText = baitMap[fish].message;
+        baitImg.src = baitMap[fish].img;
+        baitImg.alt = baitMap[fish].alt;
       }
     </script>
   </body>
 </html>
+``
