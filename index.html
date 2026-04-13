@@ -1,19 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My First Vibe App</title>
+    <title>Bait Finder</title>
   </head>
 
   <body>
-    <h1>Welcome to My App</h1>
+    <h1>Bait Finder</h1>
 
-    <button onclick="sayHello()">Click Me</button>
+    <p>Select a fish species:</p>
+
+    <select id="fish">
+      <option value="">-- Choose a fish --</option>
+      <option value="bass">Bass</option>
+      <option value="trout">Trout</option>
+      <option value="catfish">Catfish</option>
+      <option value="crappie">Crappie</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="recommendBait()">Recommend Bait</button>
 
     <p id="output"></p>
 
     <script>
-      function sayHello() {
-        document.getElementById("output").innerText = "Hello, world!";
+      function recommendBait() {
+        const fish = document.getElementById("fish").value;
+        let result = "";
+
+        if (fish === "bass") {
+          result = "Try green pumpkin or black/blue.";
+        } else if (fish === "trout") {
+          result = "Try white, silver, or natural colors.";
+        } else if (fish === "catfish") {
+          result = "Try dark colors or smelly baits.";
+        } else if (fish === "crappie") {
+          result = "Try chartreuse or white.";
+        } else {
+          result = "Please select a fish species.";
+        }
+
+        document.getElementById("output").innerText = result;
       }
     </script>
   </body>
