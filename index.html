@@ -24,7 +24,6 @@
       max-width: 640px;
       text-align: center;
       box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -73,6 +72,8 @@
       border: 1px solid #e2e8f0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       background: white;
+      display: block;
+      margin: 0 auto;
     }
 
     #output {
@@ -104,6 +105,16 @@
 
   <script>
     function makeCard(title, subtitle, bg1, bg2) {
+      // --- “Anchor bottom-right with margin” settings ---
+      // These are approximate dimensions of the fish art group (in the 960x480 viewBox coordinate space).
+      // If you ever change the fish drawing size a lot, just adjust these two numbers.
+      const MARGIN = 20;
+      const FISH_W = 300;  // estimated width of fish group content
+      const FISH_H = 170;  // estimated height of fish group content
+
+      const fishX = 960 - MARGIN - FISH_W;
+      const fishY = 480 - MARGIN - FISH_H;
+
       return `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480">
   <defs>
@@ -117,20 +128,23 @@
     </filter>
 
     <style>
+      /* Playful bob */
       @keyframes bob {
         0%,100% { transform: translateY(0); }
         50% { transform: translateY(-14px); }
       }
 
+      /* Playful tail wag */
       @keyframes wag {
         0%,100% { transform: rotate(18deg); }
         50% { transform: rotate(-22deg); }
       }
 
-      @keyframes bubble {
-        0% { transform: translateY(0); opacity: 0; }
-        15% { opacity: 0.6; }
-        100% { transform: translateY(-90px); opacity: 0; }
+      /* Bubbles rise from mouth */
+      @keyframes bubbleUp {
+        0%   { transform: translate(0, 0); opacity: 0; }
+        15%  { opacity: 0.65; }
+        100% { transform: translate(-18px, -110px); opacity: 0; }
       }
 
       .fish {
@@ -138,13 +152,14 @@
       }
 
       .tail {
-        transform-origin: 260px 70px;
+        transform-origin: 200px 70px; /* hinge point near where tail meets body */
         animation: wag 0.9s ease-in-out infinite;
       }
 
-      .bubble1 { animation: bubble 2.6s infinite; }
-      .bubble2 { animation: bubble 3.2s infinite; animation-delay: .6s; }
-      .bubble3 { animation: bubble 3.8s infinite; animation-delay: 1.2s; }
+      .bubble1 { animation: bubbleUp 2.4s infinite; }
+      .bubble2 { animation: bubbleUp 3.0s infinite; animation-delay: 0.5s; }
+      .bubble3 { animation: bubbleUp 3.6s infinite; animation-delay: 1.0s; }
+      .bubble4 { animation: bubbleUp 4.2s infinite; animation-delay: 1.6s; }
     </style>
   </defs>
 
@@ -164,34 +179,41 @@
     </text>
   </g>
 
-  <!-- Fish -->
-  <g class="fish" transform="translate(610,300)" filter="url(#soft)" opacity="0.9">
+  <!-- Fish: POSITION wrapper (bottom-right with 20px margin) -->
+  <g transform="translate(${fishX},${fishY})">
+    <!-- Fish: ANIMATION wrapper -->
+    <g class="fish" filter="url(#soft)" opacity="0.9">
 
-    <!-- bubbles -->
-    <g fill="#fff" opacity="0.35">
-      <circle class="bubble1" cx="300" cy="160" r="9"/>
-      <circle class="bubble2" cx="340" cy="190" r="6"/>
-      <circle class="bubble3" cx="320" cy="220" r="4"/>
+      <!-- bubbles from mouth (front/left side of fish) -->
+      <g fill="#fff" opacity="0.38">
+        <circle class="bubble1" cx="18" cy="78" r="8"/>
+        <circle class="bubble2" cx="34" cy="92" r="6"/>
+        <circle class="bubble3" cx="24" cy="112" r="4"/>
+        <circle class="bubble4" cx="44" cy="120" r="3"/>
+      </g>
+
+      <!-- fish body -->
+      <ellipse cx="110" cy="70" rx="95" ry="46"
+        fill="none" stroke="#fff" stroke-width="16"/>
+
+      <!-- mouth hint -->
+      <path d="M18 78 C26 82, 34 82, 40 78"
+        fill="none" stroke="#fff" stroke-width="6" opacity="0.7" stroke-linecap="round"/>
+
+      <!-- eye -->
+      <circle cx="70" cy="60" r="6" fill="#fff"/>
+
+      <!-- fin -->
+      <path d="M110 70 C120 35,160 35,170 62"
+        fill="none" stroke="#fff" stroke-width="6" opacity="0.6"/>
+
+      <!-- tail -->
+      <g class="tail">
+        <path d="M200 70 L265 25 L265 115 Z"
+          fill="none" stroke="#fff" stroke-width="16"
+          stroke-linejoin="round"/>
+      </g>
     </g>
-
-    <!-- body -->
-    <ellipse cx="110" cy="70" rx="95" ry="46"
-      fill="none" stroke="#fff" stroke-width="16"/>
-
-    <!-- eye -->
-    <circle cx="70" cy="60" r="6" fill="#fff"/>
-
-    <!-- fin -->
-    <path d="M110 70 C120 35,160 35,170 62"
-      fill="none" stroke="#fff" stroke-width="6" opacity="0.6"/>
-
-    <!-- tail -->
-    <g class="tail">
-      <path d="M200 70 L265 25 L265 115 Z"
-        fill="none" stroke="#fff" stroke-width="16"
-        stroke-linejoin="round"/>
-    </g>
-
   </g>
 </svg>`;
     }
@@ -199,23 +221,19 @@
     const baitMap = {
       bass: {
         text: "Bass: Try green pumpkin or black/blue.",
-        svg: makeCard("Green Pumpkin", "bass confidence colors",
-          "#3d4f1f", "#121911")
+        svg: makeCard("Green Pumpkin", "bass confidence colors", "#3d4f1f", "#121911")
       },
       trout: {
         text: "Trout: Try white, silver, or natural colors.",
-        svg: makeCard("White / Silver", "natural & subtle flash",
-          "#eef2f7", "#9fb1c6")
+        svg: makeCard("White / Silver", "natural & subtle flash", "#eef2f7", "#9fb1c6")
       },
       catfish: {
         text: "Catfish: Try dark colors and/or smelly baits.",
-        svg: makeCard("Dark / Night", "big silhouette + scent",
-          "#1a1a1a", "#3a2d2a")
+        svg: makeCard("Dark / Night", "big silhouette + scent", "#1a1a1a", "#3a2d2a")
       },
       crappie: {
         text: "Crappie: Try chartreuse or white.",
-        svg: makeCard("Chartreuse", "high visibility",
-          "#caff00", "#ffffff")
+        svg: makeCard("Chartreuse", "high visibility", "#caff00", "#ffffff")
       }
     };
 
