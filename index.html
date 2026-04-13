@@ -1,265 +1,238 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Bait Finder</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bait Finder</title>
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f7fa;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        padding: 20px;
-      }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
 
-      .app {
-        background: white;
-        padding: 28px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 600px;
-        text-align: center;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    .app {
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 640px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
-      h1 {
-        margin: 0;
-        font-size: 42px;
-        line-height: 1.1;
-      }
+    h1 {
+      margin: 0;
+      font-size: 42px;
+    }
 
-      .controls {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
+    .hint {
+      font-size: 14px;
+      color: #637083;
+      margin: 0;
+    }
 
-      select, button {
-        padding: 10px 12px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid #cfd6df;
-      }
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-      button {
-        cursor: pointer;
-        background: #1f6feb;
-        color: white;
-        border: 1px solid #1f6feb;
-      }
+    select, button {
+      padding: 10px 14px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #cfd6df;
+    }
 
-      button:hover {
-        background: #185bd0;
-      }
+    button {
+      background: #1f6feb;
+      color: white;
+      cursor: pointer;
+    }
 
-      /* Image area */
-      .imageWrap {
-        display: flex;
-        justify-content: center;
-      }
+    button:hover {
+      background: #185bd0;
+    }
 
-      img#baitImg {
-        width: 100%;
-        max-width: 480px;
-        height: auto;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        background: #fff;
-      }
+    #baitArt svg {
+      width: 100%;
+      max-width: 520px;
+      height: auto;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: white;
+    }
 
-      #output {
-        font-size: 18px;
-        margin: 0;
-      }
+    #output {
+      font-size: 18px;
+      margin: 0;
+    }
+  </style>
+</head>
 
-      .hint {
-        font-size: 13px;
-        color: #637083;
-        margin: 0;
-      }
-    </style>
-  </head>
+<body>
+  <div class="app">
+    <h1>Bait Finder</h1>
+    <p class="hint">Pick a species → get a playful color cue.</p>
 
-  <body>
-    <div class="app">
-      <h1>Bait Finder</h1>
-
-      <p class="hint">Pick a species → get a quick color suggestion.</p>
-
-      <div class="controls">
-        <select id="fish">
-          <option value="">-- Choose a fish --</option>
-          <option value="bass">Bass</option>
-          <option value="trout">Trout</option>
-          <option value="catfish">Catfish</option>
-          <option value="crappie">Crappie</option>
-        </select>
-
-        <button onclick="recommendBait()">Recommend Bait</button>
-      </div>
-
-      <div class="imageWrap">
-        <img
-          id="baitImg"
-          alt="Bait color recommendation will appear here"
-          src=""
-        />
-      </div>
-
-      <p id="output">Choose a fish and click “Recommend Bait”.</p>
+    <div class="controls">
+      <select id="fish">
+        <option value="">-- Choose a fish --</option>
+        <option value="bass">Bass</option>
+        <option value="trout">Trout</option>
+        <option value="catfish">Catfish</option>
+        <option value="crappie">Crappie</option>
+      </select>
+      <button onclick="recommendBait()">Recommend Bait</button>
     </div>
 
-    <script>
-      // Helper: turn an SVG string into an image src
-      function svgData(svgString) {
-        return "data:image/svg+xml;utf8," + encodeURIComponent(svgString);
+    <div id="baitArt"></div>
+    <p id="output">Choose a fish and click “Recommend Bait”.</p>
+  </div>
+
+  <script>
+    function makeCard(title, subtitle, bg1, bg2) {
+      return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${bg1}"/>
+      <stop offset="100%" stop-color="${bg2}"/>
+    </linearGradient>
+
+    <filter id="soft">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+
+    <style>
+      @keyframes bob {
+        0%,100% { transform: translateY(0); }
+        50% { transform: translateY(-14px); }
       }
 
-      // Helper: generate a simple "color card" image
-      function makeCard(title, subtitle, bg1, bg2, accent, stripes = false) {
-        const stripeLayer = stripes
-          ? `<g opacity="0.18">
-               <rect x="-80" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
-               <rect x="0" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
-               <rect x="80" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
-               <rect x="160" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
-               <rect x="240" y="0" width="80" height="140" fill="${accent}" transform="rotate(20 0 0)"/>
-             </g>`
-          : "";
-
-        const svg = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480">
-            <defs>
-              <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="${bg1}"/>
-                <stop offset="100%" stop-color="${bg2}"/>
-              </linearGradient>
-              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.25"/>
-              </filter>
-            </defs>
-
-            <rect width="960" height="480" rx="36" fill="url(#bg)"/>
-            ${stripeLayer}
-
-            <!-- Simple lure silhouette -->
-<!-- Simple fish silhouette -->
-<g transform="translate(690,130)" filter="url(#soft)" opacity="0.85">
-  <!-- Body -->
-  <ellipse
-    cx="110"
-    cy="70"
-    rx="95"
-    ry="45"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="16"
-  />
-
-  <!-- Tail -->
-  <path
-    d="M200 70 L260 30 L260 110 Z"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="16"
-    stroke-linejoin="round"
-  />
-
-  <!-- Eye -->
-  <circle cx="75" cy="60" r="6" fill="#ffffff" />
-
-  <!-- Fin (subtle curve) -->
-  <path
-    d="M110 70 C120 40, 155 40, 165 60"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="6"
-    opacity="0.6"
-  />
-</g>  
-          </svg>
-        `;
-        return svgData(svg);
+      @keyframes wag {
+        0%,100% { transform: rotate(18deg); }
+        50% { transform: rotate(-22deg); }
       }
 
-      // “Database” for recommendations (text + image)
-      const baitMap = {
-        bass: {
-          message: "Bass: Try green pumpkin or black/blue.",
-          img: makeCard(
-            "Green Pumpkin",
-            "and Black/Blue accents",
-            "#3d4f1f",
-            "#101418",
-            "#0b0f14",
-            true
-          ),
-          alt: "Green pumpkin and black-blue color card"
-        },
-        trout: {
-          message: "Trout: Try white, silver, or natural colors.",
-          img: makeCard(
-            "White / Silver",
-            "natural + subtle flash",
-            "#e8edf5",
-            "#8fa3b7",
-            "#ffffff",
-            false
-          ),
-          alt: "White and silver color card"
-        },
-        catfish: {
-          message: "Catfish: Try dark colors and/or smelly baits.",
-          img: makeCard(
-            "Dark / Night",
-            "big silhouette + scent",
-            "#1a1a1a",
-            "#3a2d2a",
-            "#000000",
-            true
-          ),
-          alt: "Dark color card"
-        },
-        crappie: {
-          message: "Crappie: Try chartreuse or white.",
-          img: makeCard(
-            "Chartreuse",
-            "with white combo",
-            "#b6ff00",
-            "#ffffff",
-            "#224400",
-            false
-          ),
-          alt: "Chartreuse and white color card"
-        }
-      };
-
-      function recommendBait() {
-        const fish = document.getElementById("fish").value;
-        const output = document.getElementById("output");
-        const baitImg = document.getElementById("baitImg");
-
-        if (!fish || !baitMap[fish]) {
-          output.innerText = "Please select a fish species.";
-          baitImg.src = "";
-          baitImg.alt = "No recommendation yet";
-          return;
-        }
-
-        output.innerText = baitMap[fish].message;
-        baitImg.src = baitMap[fish].img;
-        baitImg.alt = baitMap[fish].alt;
+      @keyframes bubble {
+        0% { transform: translateY(0); opacity: 0; }
+        15% { opacity: 0.6; }
+        100% { transform: translateY(-90px); opacity: 0; }
       }
-    </script>
-  </body>
+
+      .fish {
+        animation: bob 2.2s ease-in-out infinite;
+      }
+
+      .tail {
+        transform-origin: 260px 70px;
+        animation: wag 0.9s ease-in-out infinite;
+      }
+
+      .bubble1 { animation: bubble 2.6s infinite; }
+      .bubble2 { animation: bubble 3.2s infinite; animation-delay: .6s; }
+      .bubble3 { animation: bubble 3.8s infinite; animation-delay: 1.2s; }
+    </style>
+  </defs>
+
+  <rect width="960" height="480" rx="38" fill="url(#bg)"/>
+
+  <!-- Text -->
+  <g fill="#fff" font-family="Arial, sans-serif">
+    <text x="56" y="120" font-size="56" font-weight="700">${title}</text>
+    <text x="56" y="175" font-size="32" opacity="0.95">${subtitle}</text>
+  </g>
+
+  <!-- Label -->
+  <g transform="translate(56,360)">
+    <rect width="420" height="74" rx="18" fill="rgba(255,255,255,0.2)"/>
+    <text x="24" y="48" font-size="26" fill="#fff">
+      Quick color cue (not a rule)
+    </text>
+  </g>
+
+  <!-- Fish -->
+  <g class="fish" transform="translate(610,150)" filter="url(#soft)" opacity="0.9">
+
+    <!-- bubbles -->
+    <g fill="#fff" opacity="0.35">
+      <circle class="bubble1" cx="300" cy="160" r="9"/>
+      <circle class="bubble2" cx="340" cy="190" r="6"/>
+      <circle class="bubble3" cx="320" cy="220" r="4"/>
+    </g>
+
+    <!-- body -->
+    <ellipse cx="110" cy="70" rx="95" ry="46"
+      fill="none" stroke="#fff" stroke-width="16"/>
+
+    <!-- eye -->
+    <circle cx="70" cy="60" r="6" fill="#fff"/>
+
+    <!-- fin -->
+    <path d="M110 70 C120 35,160 35,170 62"
+      fill="none" stroke="#fff" stroke-width="6" opacity="0.6"/>
+
+    <!-- tail -->
+    <g class="tail">
+      <path d="M200 70 L265 25 L265 115 Z"
+        fill="none" stroke="#fff" stroke-width="16"
+        stroke-linejoin="round"/>
+    </g>
+
+  </g>
+</svg>`;
+    }
+
+    const baitMap = {
+      bass: {
+        text: "Bass: Try green pumpkin or black/blue.",
+        svg: makeCard("Green Pumpkin", "bass confidence colors",
+          "#3d4f1f", "#121911")
+      },
+      trout: {
+        text: "Trout: Try white, silver, or natural colors.",
+        svg: makeCard("White / Silver", "natural & subtle flash",
+          "#eef2f7", "#9fb1c6")
+      },
+      catfish: {
+        text: "Catfish: Try dark colors and/or smelly baits.",
+        svg: makeCard("Dark / Night", "big silhouette + scent",
+          "#1a1a1a", "#3a2d2a")
+      },
+      crappie: {
+        text: "Crappie: Try chartreuse or white.",
+        svg: makeCard("Chartreuse", "high visibility",
+          "#caff00", "#ffffff")
+      }
+    };
+
+    function recommendBait() {
+      const fish = document.getElementById("fish").value;
+      const art = document.getElementById("baitArt");
+      const output = document.getElementById("output");
+
+      if (!fish || !baitMap[fish]) {
+        art.innerHTML = "";
+        output.innerText = "Please select a fish species.";
+        return;
+      }
+
+      art.innerHTML = baitMap[fish].svg;
+      output.innerText = baitMap[fish].text;
+    }
+  </script>
+</body>
 </html>
-``
