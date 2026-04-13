@@ -152,27 +152,40 @@
             ${stripeLayer}
 
             <!-- Simple lure silhouette -->
-            <g transform="translate(705,115)" filter="url(#soft)" opacity="0.95">
-              <path d="M40 40 C120 10, 190 60, 200 115 C210 175, 150 220, 90 220 C25 220, -5 170, 5 130 C10 110, 25 90, 40 80"
-                    fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
-              <circle cx="40" cy="40" r="10" fill="#ffffff"/>
-              <path d="M190 225 C205 245, 230 245, 240 225" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
-              <path d="M210 230 C212 252, 240 262, 252 244" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
-            </g>
+<!-- Simple fish silhouette -->
+<g transform="translate(690,130)" filter="url(#soft)" opacity="0.85">
+  <!-- Body -->
+  <ellipse
+    cx="110"
+    cy="70"
+    rx="95"
+    ry="45"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="16"
+  />
 
-            <!-- Text -->
-            <g font-family="Arial, sans-serif" fill="#ffffff">
-              <text x="56" y="120" font-size="56" font-weight="700">${title}</text>
-              <text x="56" y="175" font-size="32" opacity="0.95">${subtitle}</text>
-            </g>
+  <!-- Tail -->
+  <path
+    d="M200 70 L260 30 L260 110 Z"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="16"
+    stroke-linejoin="round"
+  />
 
-            <!-- Bottom badge -->
-            <g transform="translate(56,360)">
-              <rect width="410" height="74" rx="18" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.35)"/>
-              <text x="24" y="48" font-family="Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.98">
-                Quick color cue (not a rule)
-              </text>
-            </g>
+  <!-- Eye -->
+  <circle cx="75" cy="60" r="6" fill="#ffffff" />
+
+  <!-- Fin (subtle curve) -->
+  <path
+    d="M110 70 C120 40, 155 40, 165 60"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="6"
+    opacity="0.6"
+  />
+</g>  
           </svg>
         `;
         return svgData(svg);
