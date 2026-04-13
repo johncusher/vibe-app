@@ -2,62 +2,61 @@
 <html>
   <head>
     <title>Bait Finder</title>
+
     <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f7fa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #34ebd2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
 
-.app {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  width: 320px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      .app {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
 
+      select, button {
+        padding: 8px;
+        font-size: 16px;
+      }
 
-  button {
-    padding: 10px 16px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  select {
-    padding: 6px;
-    font-size: 16px;
-  }
-</style>
-
+      button {
+        cursor: pointer;
+      }
+    </style>
   </head>
 
   <body>
-    <h1>Bait Finder</h1>
+    <!-- ✅ THIS DIV IS CRITICAL -->
+    <div class="app">
+      <h1>Bait Finder</h1>
 
-    <p>Select a fish species:</p>
+      <p>Select a fish species:</p>
 
-    <select id="fish">
-      <option value="">-- Choose a fish --</option>
-      <option value="bass">Bass</option>
-      <option value="trout">Trout</option>
-      <option value="catfish">Catfish</option>
-      <option value="crappie">Crappie</option>
-    </select>
+      <select id="fish">
+        <option value="">-- Choose a fish --</option>
+        <option value="bass">Bass</option>
+        <option value="trout">Trout</option>
+        <option value="catfish">Catfish</option>
+        <option value="crappie">Crappie</option>
+      </select>
 
-    <br><br>
+      <button onclick="recommendBait()">Recommend Bait</button>
 
-    <button onclick="recommendBait()">Recommend Bait</button>
-
-    <p id="output"></p>
+      <p id="output"></p>
+    </div>
 
     <script>
       function recommendBait() {
@@ -81,4 +80,3 @@
     </script>
   </body>
 </html>
-
